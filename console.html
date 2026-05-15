@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TheCIAA | Console System</title>
+    <style>
+        body { background: #000; color: #0f0; font-family: 'Courier New', monospace; padding: 40px; }
+        .main-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
+        .panel { background: #111; border: 1px solid #333; padding: 25px; border-radius: 10px; }
+        h2 { color: #deff9a; border-bottom: 1px solid #333; padding-bottom: 10px; font-size: 1.2rem; }
+        
+        label { display: block; margin-top: 15px; font-size: 0.8rem; color: #888; }
+        input { 
+            background: #1a1a1a; border: 1px solid #0f0; color: #0f0; 
+            padding: 12px; margin: 5px 0; width: 100%; box-sizing: border-box; outline: none;
+        }
+        input:focus { border-color: #fff; box-shadow: 0 0 10px rgba(0,255,0,0.2); }
+        
+        .actions { margin-top: 20px; display: flex; gap: 10px; }
+        button { 
+            flex: 1; padding: 15px; cursor: pointer; font-weight: bold; 
+            text-transform: uppercase; border: none; transition: 0.2s;
+        }
+        .btn-add { background: #0f0; color: #000; }
+        .btn-delete { background: #f00; color: #fff; }
+        button:hover { opacity: 0.8; transform: translateY(-2px); }
+
+        #log { 
+            margin-top: 30px; padding: 15px; background: #050505; 
+            border-left: 4px solid #0f0; font-size: 0.9rem; height: 150px; overflow-y: auto;
+        }
+        .log-entry { margin-bottom: 5px; color: #0c0; }
+        .log-error { color: #f00; }
+
+        .back-link { display: inline-block; margin-bottom: 20px; color: #deff9a; text-decoration: none; }
+        .back-link:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <a href="home.html" class="back-link">← VOLVER AL HOME</a>
+    <h1>SYSTEM CONSOLE > V2.0_PERSISTENCE</h1>
+    
+    <div class="main-grid">
+        <!-- Panel de Creación -->
+        <div class="panel">
+            <h2>NEW_BLOCK_COMMAND</h2>
+            <label>ID Único (ej: bmc-single):</label>
+            <input type="text" id="blockId" placeholder="ID para control">
+            <label>Nombre del Álbum:</label>
+            <input type="text" id="blockName" placeholder="Nombre visible">
+            <label>Imagen (URL):</label>
+            <input type="text" id="blockImg" placeholder="https://...">
+            <label>Link de Destino:</label>
+            <input type="text" id="blockLink" placeholder="archivo.html">
+            <div class="actions">
+                <button class="btn-add" onclick="saveBlock()">EJECUTAR_GUARDADO</button>
+            </div>
+        </div>
+
+        <!-- Panel de Borrado -->
+        <div class="panel">
+            <h2>TERMINATE_BLOCK_COMMAND</h2>
+            <label>Ingresa el ID del bloque a eliminar:</label>
+            <input type="text" id="deleteId" placeholder="ID del bloque">
+            <div class="actions">
+                <button class="btn-delete" onclick="deleteBlock()">EJECUTAR_BORRADO</button>
+            </div>
+            
+            <div id="log">
+                <div class="log-entry">> Sistema inicializado...</div>
+                <div class="log-entry">> Esperando comandos...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function log(msg, type = 'entry') {
+            const logDiv = document.getElementById('log');
+            const entry = document.createElement('div');
+            entry.className = type === 'error' ? 'log-error' : 'log-entry';
+            entry.innerText = `> ${new Date().toLocaleTimeString()}: ${msg}`;
+            logDiv.prepend(entry);
+        }
+
+        function saveBlock() {
+            const id = document.getElementById('blockId').value.trim();
+            const name = document.getElementById('blockName').value.trim();
+            const img = document.getElementById('blockImg').value.trim();
+            const link = document.getElementById('blockLink').value.trim();
+
+            if(!id || !name) {
+                log("ERROR: ID y Nombre son obligatorios.", "error");
+                return;
+            }
+
+            let blocks = JSON.parse(localStorage.getItem('theciaa_blocks')) || [];
+            
+            // Evitar duplicados por ID
+            blocks = blocks.filter(b => b.id !== id);
+            
+            blocks.push({ id, name, img, link });
+            localStorage.setItem('theciaa_blocks', JSON.stringify(blocks));
+
+            log(`BLOQUE [${id}] GUARDADO PERMANENTEMENTE.`);
+            
+            // Limpiar campos
+            document.getElementById('blockId').value = '';
+            document.getElementById('blockName').value = '';
+            document.getElementById('blockImg').value = '';
+            document.getElementById('blockLink').value = '';
+        }
+
+        function deleteBlock() {
+            const idToDelete = document.getElementById('deleteId').value.trim();
+            if(!idToDelete) return log("ERROR: Ingresa un ID para borrar.", "error");
+
+            let blocks = JSON.parse(localStorage.getItem('theciaa_blocks')) || [];
+            const initialCount = blocks.length;
+            
+            blocks = blocks.filter(b => b.id !== idToDelete);
+            
+            if(blocks.length === initialCount) {
+                log(`ERROR: No se encontró el ID [${idToDelete}].`, "error");
+            } else {
+                localStorage.setItem('theciaa_blocks', JSON.stringify(blocks));
+                log(`BLOQUE [${idToDelete}] ELIMINADO DEL SISTEMA.`);
+                document.getElementById('deleteId').value = '';
+            }
+        }
+    </script>
+</body>
+</html>
