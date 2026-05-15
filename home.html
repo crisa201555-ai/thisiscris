@@ -1,66 +1,208 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ThisIsCris | Home</title>
+    <title>TheCIAA | Global Artist Portal</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
+        :root {
+            --accent: #deff9a;
+            --bg-dark: #0f172a;
+            --bg-lighter: #1e293b;
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
+        }
+
         body {
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #0f172a;
-            color: #f8fafc;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
+            margin: 0; padding: 0;
+            font-family: 'Urbanist', 'Segoe UI', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            display: flex; flex-direction: column;
+            align-items: center; min-height: 100vh;
+            overflow-x: hidden;
         }
-        .container {
-            text-align: center;
-            padding: 40px;
-            background: rgba(30, 41, 59, 0.7);
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            max-width: 600px;
+
+        /* Fondo Animado */
+        .bg-glow {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at 50% 50%, var(--bg-lighter) 0%, var(--bg-dark) 100%);
+            z-index: -1;
         }
-        h1 {
-            font-size: 3rem;
-            margin-bottom: 10px;
-            color: #deff9a;
+
+        /* Esquina Superior: Reloj Global */
+        #datetime {
+            position: absolute; top: 20px; right: 30px;
+            text-align: right; font-family: 'Courier New', monospace;
+            color: var(--accent); background: rgba(0,0,0,0.5);
+            padding: 12px 20px; border-radius: 12px; 
+            border: 1px solid rgba(222, 255, 154, 0.2);
+            backdrop-filter: blur(5px); z-index: 100;
+        }
+
+        /* Header Estilo Global */
+        .header-section {
+            text-align: center; padding: 100px 20px 60px;
+            width: 100%; max-width: 1200px;
+        }
+        h1 { 
+            font-size: clamp(3rem, 8vw, 6rem); margin: 0; 
+            color: var(--accent); letter-spacing: 15px; 
+            text-transform: uppercase; font-weight: 900;
+            filter: drop-shadow(0 0 10px rgba(222, 255, 154, 0.3));
+        }
+        .tagline { 
+            font-size: 1.2rem; color: var(--text-dim); 
+            margin-bottom: 40px; letter-spacing: 3px; 
             text-transform: uppercase;
-            letter-spacing: 5px;
         }
-        p {
-            font-size: 1.2rem;
-            color: #94a3b8;
-            margin-bottom: 30px;
+        
+        .nav-links { display: flex; gap: 20px; justify-content: center; margin-bottom: 80px; }
+        .btn {
+            padding: 14px 35px; border-radius: 8px;
+            text-decoration: none; font-weight: bold;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            font-size: 0.9rem; letter-spacing: 1px;
+            display: flex; align-items: center; gap: 10px;
         }
-        .nav-btn {
-            display: inline-block;
-            padding: 15px 40px;
-            background-color: #deff9a;
-            color: #0f172a;
-            text-decoration: none;
-            font-weight: bold;
-            border-radius: 50px;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(222, 255, 154, 0.3);
+        .btn-primary { background: var(--accent); color: var(--bg-dark); }
+        .btn-secondary { border: 2px solid var(--accent); color: var(--accent); }
+        .btn:hover { transform: scale(1.05) translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.4); }
+
+        /* Sección de Música Dinámica */
+        .section-title {
+            width: 90%; max-width: 1200px; margin-bottom: 30px;
+            border-left: 4px solid var(--accent); padding-left: 15px;
+            font-size: 1.5rem; text-transform: uppercase; letter-spacing: 2px;
         }
-        .nav-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(222, 255, 154, 0.5);
-            background-color: #f0ffd1;
+
+        #album-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 30px; width: 90%; max-width: 1200px;
+            padding-bottom: 100px;
+        }
+
+        .bloque-album {
+            height: 350px; border-radius: 24px; position: relative;
+            overflow: hidden; display: flex; align-items: flex-end;
+            padding: 30px; background-size: cover; background-position: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: 0.5s ease; cursor: pointer;
+        }
+        .bloque-album::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(to top, rgba(15, 23, 42, 0.95) 0%, transparent 60%);
+            transition: 0.3s;
+        }
+        .bloque-album:hover { transform: translateY(-10px); border-color: var(--accent); }
+        .bloque-album:hover::before { background: linear-gradient(to top, var(--bg-dark) 20%, transparent 100%); }
+
+        .bloque-content { position: relative; z-index: 1; width: 100%; }
+        .bloque-content h3 { margin: 0; color: #fff; font-size: 1.8rem; }
+        .bloque-btn {
+            display: inline-block; margin-top: 15px; padding: 10px 25px;
+            background: var(--accent); color: var(--bg-dark); text-decoration: none;
+            border-radius: 6px; font-weight: bold; font-size: 0.8rem;
+            transition: 0.3s;
+        }
+
+        /* Footer Global */
+        footer {
+            width: 100%; padding: 60px 20px; background: rgba(0,0,0,0.4);
+            text-align: center; border-top: 1px solid rgba(255,255,255,0.05);
+        }
+        .social-icons { display: flex; gap: 30px; justify-content: center; margin-bottom: 20px; }
+        .social-icons a { color: var(--text-dim); font-size: 1.5rem; transition: 0.3s; }
+        .social-icons a:hover { color: var(--accent); transform: scale(1.2); }
+        .copyright { font-size: 0.8rem; color: var(--text-dim); letter-spacing: 1px; }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 3rem; letter-spacing: 5px; }
+            #datetime { position: relative; top: 0; right: 0; margin-top: 20px; text-align: center; }
+            .nav-links { flex-direction: column; align-items: center; }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>THIS IS CRIS</h1>
-        <p>Bienvenido a mi mundo. Música, pasión y Concepción.</p>
-        <a href="discografía.html" class="nav-btn">VER DISCOGRAFÍA</a>
+    <div class="bg-glow"></div>
+
+    <div id="datetime">
+        <div id="date"></div>
+        <div id="time" style="font-size: 1.6rem; font-weight: bold; letter-spacing: 2px;"></div>
+        <div style="font-size: 0.7rem; opacity: 0.7;">GLOBAL STREAMING TIME</div>
     </div>
+
+    <header class="header-section">
+        <h1>THECIAA</h1>
+        <p class="tagline">Chilean Soul • Global Sound</p>
+        <div class="nav-links">
+            <a href="discografía.html" class="btn btn-primary">
+                <i class="fa-solid fa-compact-disc"></i> DISCOGRAFÍA
+            </a>
+            <a href="console.html" class="btn btn-secondary">
+                <i class="fa-solid fa-terminal"></i> SYSTEM CONSOLE
+            </a>
+        </div>
+    </header>
+
+    <h2 class="section-title">Latest Projects</h2>
+    <div id="album-grid">
+        <!-- Bloques de LocalStorage -->
+    </div>
+
+    <footer>
+        <div class="social-icons">
+            <a href="#"><i class="fa-brands fa-spotify"></i></a>
+            <a href="#"><i class="fa-brands fa-instagram"></i></a>
+            <a href="#"><i class="fa-brands fa-youtube"></i></a>
+            <a href="#"><i class="fa-brands fa-tiktok"></i></a>
+        </div>
+        <p class="copyright">© 2024 THECIAA MUSIC GROUP. ALL RIGHTS RESERVED. FROM CONCEPCIÓN TO THE WORLD.</p>
+    </footer>
+
+    <script>
+        // Reloj Global
+        function updateClock() {
+            const now = new Date();
+            const options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
+            document.getElementById('date').innerText = now.toLocaleDateString('en-US', options).toUpperCase();
+            document.getElementById('time').innerText = now.toLocaleTimeString('en-US', { hour12: false });
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // Cargar Discografía Dinámica
+        function loadBlocks() {
+            const grid = document.getElementById('album-grid');
+            const savedBlocks = JSON.parse(localStorage.getItem('theciaa_blocks')) || [];
+            
+            if (savedBlocks.length === 0) {
+                grid.innerHTML = '<p style="color: var(--text-dim);">No global releases found in system memory.</p>';
+                return;
+            }
+
+            grid.innerHTML = '';
+            savedBlocks.forEach(block => {
+                const div = document.createElement('div');
+                div.className = 'bloque-album';
+                div.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.1)), url('${block.img}')`;
+                div.onclick = () => window.location.href = block.link;
+                
+                div.innerHTML = `
+                    <div class="bloque-content">
+                        <h3>${block.name}</h3>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                             <span class="bloque-btn">EXPLORE RELEASE</span>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(div);
+            });
+        }
+
+        window.onload = loadBlocks;
+    </script>
 </body>
 </html>
